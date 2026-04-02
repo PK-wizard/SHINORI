@@ -8,6 +8,20 @@ from django.db.models import Q
 from .models import Task
 import json
 
+def register(request):
+    if request.user.is_authenticated:
+        return redirect('dashboard')
+    if request.method == 'POST':
+        name = request.POST.get('name', '').strip()
+        email = request.POST.get('email', '').strip()
+        password = request.POST.get('password', '').strip()  # ADD THIS
+        from django.contrib.auth.models import User
+        if User.objects.filter(username=email).exists():
+            return render(request, 'tasks/register.html', {'error': 'A warrior with that email already exists.'})
+        user = User.objects.create_user(username=email, email=email, password=password, first_name=name)  # CHANGE password=email + '_shinori' to password=password
+        login(request, user)
+        return redirect('dashboard')
+    return render(request, 'tasks/register.html') 
 
 def register(request):
     if request.user.is_authenticated:
