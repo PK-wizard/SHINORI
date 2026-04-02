@@ -1,0 +1,58 @@
+{% extends 'tasks/base.html' %}
+
+{% block content %}
+<!-- STAT CARDS -->
+<div class="stats-row">
+  <div class="stat-card">
+    <div class="stat-number">{{ total }}</div>
+    <div class="stat-label">Total</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-number">{{ remaining }}</div>
+    <div class="stat-label">Remaining</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-number">{{ slayed }}</div>
+    <div class="stat-label">Slayed</div>
+  </div>
+</div>
+
+<!-- ADD BAR -->
+<div class="add-bar">
+  <input class="add-input" type="text" placeholder="Name your next victim......"
+         onclick="openModal()" readonly />
+  <button class="slay-btn" onclick="openModal()">
+    ⚔ Slay
+  </button>
+</div>
+
+<!-- FILTER TABS -->
+<div class="filter-tabs">
+  <a href="{% url 'my_tasks' %}?filter=all"   class="filter-tab">All</a>
+  <a href="{% url 'my_tasks' %}?filter=slayed" class="filter-tab">Slayed</a>
+  <a href="{% url 'my_tasks' %}?filter=alive"  class="filter-tab">Alive</a>
+</div>
+
+<!-- RECENT TASKS PREVIEW -->
+<div class="task-list">
+  {% for task in recent_tasks %}
+    <div class="task-item {% if task.is_slayed %}slayed{% endif %}" onclick="toggleDetail(this)">
+      <div class="task-check {% if task.is_slayed %}checked{% endif %}"
+           onclick="slayTask({{ task.id }}, event)"></div>
+      <span class="task-title">{{ task.title }}</span>
+      <span class="priority-dot {{ task.priority }}"></span>
+      <button class="task-delete" onclick="deleteTask({{ task.id }}, event)">✕</button>
+      {% if task.description or task.due_date %}
+      <div class="task-detail">
+        {% if task.description %}{{ task.description }}{% endif %}
+        {% if task.due_date %}<br>📅 Due: {{ task.due_date }}{% endif %}
+      </div>
+      {% endif %}
+    </div>
+  {% empty %}
+    <div style="color:var(--text-faint);letter-spacing:.1em;text-align:center;padding:40px 0;">
+      No tasks yet — press <kbd style="background:var(--bg-card2);padding:2px 8px;border-radius:4px;font-family:monospace;">N</kbd> to add one
+    </div>
+  {% endfor %}
+</div>
+{% endblock %}

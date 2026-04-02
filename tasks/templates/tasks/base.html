@@ -1,0 +1,636 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Shinori – Slay Your Tasks</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-deep:    #0d0d14;
+      --bg-panel:   #13131f;
+      --bg-card:    #1c1c2e;
+      --bg-card2:   #22223a;
+      --purple:     #7c6aff;
+      --purple-dim: #4a3f8a;
+      --purple-glow:#a08fff;
+      --accent-red: #c0392b;
+      --accent-green:#27ae60;
+      --text-main:  #e8e4ff;
+      --text-dim:   #7a768f;
+      --text-faint: #4a4760;
+      --border:     #2e2b4a;
+      --sidebar-w:  260px;
+    }
+
+    * { margin:0; padding:0; box-sizing:border-box; }
+
+    body {
+      font-family: 'Rajdhani', sans-serif;
+      background: var(--bg-deep);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+    }
+
+    /* ── SIDEBAR ── */
+    .sidebar {
+      width: var(--sidebar-w);
+      min-height: 100vh;
+      background: var(--bg-panel);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 28px 0 24px;
+      position: fixed;
+      left: 0; top: 0;
+    }
+
+    .sidebar-avatar {
+      width: 90px; height: 90px;
+      border-radius: 50%;
+      border: 3px solid var(--purple-dim);
+      overflow: hidden;
+      margin-bottom: 32px;
+      background: var(--bg-card2);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .sidebar-avatar svg { width:60px; height:60px; }
+
+    .sidebar-nav { width: 100%; flex: 1; }
+
+    .sidebar-nav a {
+      display: block;
+      padding: 14px 28px;
+      text-decoration: none;
+      font-size: 1.1rem;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      transition: color .2s;
+      position: relative;
+    }
+    .sidebar-nav a:hover,
+    .sidebar-nav a.active {
+      color: var(--text-main);
+    }
+    .sidebar-nav a.active {
+      background: rgba(124,106,255,.12);
+      border-left: 3px solid var(--purple);
+    }
+    .sidebar-nav a span.hl { color: var(--purple); }
+
+    .sidebar-section {
+      padding: 10px 28px 4px;
+      font-size: .7rem;
+      letter-spacing: .2em;
+      color: var(--text-faint);
+      text-transform: uppercase;
+    }
+    .sidebar-divider {
+      height: 1px;
+      background: var(--border);
+      margin: 0 28px 6px;
+    }
+
+    .sidebar-logout {
+      padding: 16px 28px;
+      font-size: 1rem;
+      font-weight: 600;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      text-decoration: none;
+      transition: color .2s;
+    }
+    .sidebar-logout:hover { color: var(--accent-red); }
+
+    /* ── MAIN CONTENT ── */
+    .main {
+      margin-left: var(--sidebar-w);
+      flex: 1;
+      padding: 40px 48px;
+      min-height: 100vh;
+    }
+
+    /* ── LOGO HEADER ── */
+    .logo-row {
+      display: flex; align-items: center; gap: 12px;
+      margin-bottom: 32px;
+    }
+    .logo-swords { font-size: 1.4rem; color: var(--purple); }
+    .logo-title {
+      font-family: 'Cinzel', serif;
+      font-size: 2.2rem;
+      font-weight: 700;
+      letter-spacing: .08em;
+    }
+    .logo-title .dim { color: var(--text-dim); }
+    .logo-sub {
+      font-size: .75rem;
+      letter-spacing: .25em;
+      color: var(--text-dim);
+      text-transform: uppercase;
+    }
+
+    /* ── STAT CARDS ── */
+    .stats-row {
+      display: flex;
+      gap: 24px;
+      margin-bottom: 40px;
+    }
+    .stat-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 28px 36px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+      min-width: 150px;
+    }
+    .stat-card::before {
+      content:'';
+      position:absolute; top:0; left:0; right:0;
+      height:3px;
+      background: var(--purple);
+    }
+    .stat-number {
+      font-family: 'Cinzel', serif;
+      font-size: 3rem;
+      font-weight: 700;
+      color: var(--text-main);
+      line-height: 1;
+    }
+    .stat-label {
+      font-size: .7rem;
+      letter-spacing: .2em;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      margin-top: 6px;
+    }
+
+    /* ── ADD TASK BAR ── */
+    .add-bar {
+      display: flex;
+      gap: 16px;
+      margin-bottom: 28px;
+    }
+    .add-input {
+      flex: 1;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 16px 20px;
+      color: var(--text-main);
+      font-family: 'Rajdhani', sans-serif;
+      font-size: .9rem;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      outline: none;
+      transition: border-color .2s;
+    }
+    .add-input::placeholder { color: var(--text-faint); }
+    .add-input:focus { border-color: var(--purple); }
+
+    .slay-btn {
+      background: var(--purple);
+      border: none;
+      border-radius: 8px;
+      padding: 16px 32px;
+      color: #fff;
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 1rem;
+      font-weight: 700;
+      letter-spacing: .18em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: background .2s, transform .1s;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .slay-btn:hover { background: var(--purple-glow); transform: translateY(-1px); }
+    .slay-btn:active { transform: translateY(0); }
+
+    /* ── FILTER TABS ── */
+    .filter-tabs {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 24px;
+    }
+    .filter-tab {
+      padding: 8px 24px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      background: transparent;
+      color: var(--text-dim);
+      font-family: 'Rajdhani', sans-serif;
+      font-size: .85rem;
+      font-weight: 600;
+      letter-spacing: .15em;
+      text-transform: uppercase;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all .2s;
+    }
+    .filter-tab:hover,
+    .filter-tab.active {
+      background: var(--bg-card2);
+      color: var(--text-main);
+      border-color: var(--purple-dim);
+    }
+
+    /* ── TASK ITEMS ── */
+    .task-list { display: flex; flex-direction: column; gap: 10px; }
+
+    .task-item {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 18px 22px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      cursor: pointer;
+      transition: border-color .2s, background .2s;
+    }
+    .task-item:hover { border-color: var(--purple-dim); background: var(--bg-card2); }
+    .task-item.slayed { opacity: .6; }
+
+    .task-check {
+      width: 32px; height: 32px;
+      border-radius: 50%;
+      border: 2px solid var(--purple-dim);
+      flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer;
+      transition: all .2s;
+    }
+    .task-check:hover { border-color: var(--purple); }
+    .task-check.checked {
+      background: var(--purple-dim);
+      border-color: var(--purple-dim);
+    }
+    .task-check.checked::after {
+      content: '✕';
+      color: #fff;
+      font-size: .8rem;
+      font-weight: 700;
+    }
+
+    .task-title {
+      flex: 1;
+      font-size: 1rem;
+      font-weight: 600;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+    }
+    .task-item.slayed .task-title {
+      text-decoration: line-through;
+      color: var(--text-dim);
+    }
+
+    .priority-dot {
+      width: 10px; height: 10px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .priority-dot.high   { background: var(--accent-red); }
+    .priority-dot.medium { background: var(--purple); }
+    .priority-dot.low    { background: var(--accent-green); }
+
+    .task-delete {
+      background: none;
+      border: none;
+      color: var(--text-faint);
+      font-size: 1.1rem;
+      cursor: pointer;
+      padding: 4px 8px;
+      transition: color .2s;
+    }
+    .task-delete:hover { color: var(--accent-red); }
+
+    /* ── SECTION DIVIDER ── */
+    .section-divider {
+      height: 1px;
+      background: var(--border);
+      margin: 24px 0 16px;
+    }
+    .section-label {
+      font-size: .7rem;
+      letter-spacing: .2em;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+
+    /* ── TASK DETAIL EXPANDED ── */
+    .task-detail {
+      display: none;
+      padding: 8px 0 4px 48px;
+      color: var(--text-dim);
+      font-size: .95rem;
+      letter-spacing: .05em;
+    }
+    .task-detail.open { display: block; }
+
+    /* ── SEARCH ── */
+    .search-wrap {
+      position: relative;
+    }
+    .search-input {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 8px 36px 8px 14px;
+      color: var(--text-main);
+      font-family: 'Rajdhani', sans-serif;
+      font-size: .85rem;
+      letter-spacing: .1em;
+      outline: none;
+      transition: border-color .2s;
+    }
+    .search-input:focus { border-color: var(--purple); }
+    .search-icon {
+      position: absolute;
+      right: 10px; top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-faint);
+      font-size: .9rem;
+    }
+
+    /* ── PRIORITY PAGE ── */
+    .priority-section { margin-bottom: 36px; }
+    .priority-heading {
+      font-family: 'Cinzel', serif;
+      font-size: 1rem;
+      letter-spacing: .15em;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+      display: flex; align-items: center; gap: 10px;
+    }
+
+    /* ── MODAL ── */
+    .modal-overlay {
+      display: none;
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,.7);
+      z-index: 100;
+      align-items: center;
+      justify-content: center;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal {
+      background: var(--bg-card2);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 32px 36px;
+      width: 480px;
+      max-width: 95vw;
+    }
+    .modal h3 {
+      font-family: 'Cinzel', serif;
+      font-size: 1.1rem;
+      letter-spacing: .1em;
+      margin-bottom: 24px;
+      color: var(--purple-glow);
+    }
+    .modal-field { margin-bottom: 18px; }
+    .modal-field label {
+      display: block;
+      font-size: .75rem;
+      letter-spacing: .2em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      margin-bottom: 6px;
+    }
+    .modal-field input,
+    .modal-field textarea,
+    .modal-field select {
+      width: 100%;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 10px 14px;
+      color: var(--text-main);
+      font-family: 'Rajdhani', sans-serif;
+      font-size: .95rem;
+      outline: none;
+      transition: border-color .2s;
+    }
+    .modal-field input:focus,
+    .modal-field textarea:focus,
+    .modal-field select:focus { border-color: var(--purple); }
+    .modal-field textarea { resize: vertical; min-height: 80px; }
+    .modal-field select option { background: var(--bg-card2); }
+    .modal-actions { display: flex; gap: 12px; justify-content: flex-end; margin-top: 24px; }
+    .btn-cancel {
+      padding: 10px 24px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      background: transparent;
+      color: var(--text-dim);
+      font-family: 'Rajdhani', sans-serif;
+      font-size: .9rem;
+      font-weight: 600;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      cursor: pointer;
+    }
+    .btn-cancel:hover { color: var(--text-main); }
+    .btn-add {
+      padding: 10px 28px;
+      border: none;
+      border-radius: 6px;
+      background: var(--purple);
+      color: #fff;
+      font-family: 'Rajdhani', sans-serif;
+      font-size: .9rem;
+      font-weight: 700;
+      letter-spacing: .15em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: background .2s;
+    }
+    .btn-add:hover { background: var(--purple-glow); }
+
+    /* ── TOAST ── */
+    .toast {
+      position: fixed;
+      bottom: 32px; right: 32px;
+      background: var(--bg-card2);
+      border: 1px solid var(--purple-dim);
+      border-radius: 8px;
+      padding: 14px 24px;
+      color: var(--text-main);
+      font-size: .9rem;
+      letter-spacing: .08em;
+      opacity: 0;
+      transform: translateY(12px);
+      transition: opacity .3s, transform .3s;
+      z-index: 200;
+    }
+    .toast.show { opacity: 1; transform: translateY(0); }
+  </style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<nav class="sidebar">
+  <div class="sidebar-avatar">
+    <svg viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="30" cy="22" r="12" fill="#4a3f8a"/>
+      <rect x="10" y="38" width="40" height="18" rx="8" fill="#4a3f8a"/>
+      <!-- headphones -->
+      <path d="M14 22 Q14 8 30 8 Q46 8 46 22" stroke="#7c6aff" stroke-width="3" fill="none"/>
+      <rect x="10" y="20" width="8" height="10" rx="3" fill="#7c6aff"/>
+      <rect x="42" y="20" width="8" height="10" rx="3" fill="#7c6aff"/>
+    </svg>
+  </div>
+  <div class="sidebar-nav">
+    <a href="{% url 'dashboard' %}" class="{% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
+      <span class="hl">Dash</span>board
+    </a>
+    <a href="{% url 'my_tasks' %}" class="{% if request.resolver_match.url_name == 'my_tasks' %}active{% endif %}">
+      <span class="hl">My</span> Tasks
+    </a>
+    <div class="sidebar-section">Organize</div>
+    <div class="sidebar-divider"></div>
+    <a href="{% url 'priorities' %}" class="{% if request.resolver_match.url_name == 'priorities' %}active{% endif %}">
+      <span class="hl">Prior</span>ities
+    </a>
+  </div>
+  <a href="{% url 'logout' %}" class="sidebar-logout">Logout</a>
+</nav>
+
+<!-- MAIN -->
+<main class="main">
+  <div class="logo-row">
+    <span class="logo-swords">⚔</span>
+    <div>
+      <div class="logo-title">Shi<span class="dim">nori</span></div>
+      <div class="logo-sub">⚔ Slay your tasks , one by one</div>
+    </div>
+  </div>
+
+  {% block content %}{% endblock %}
+</main>
+
+<!-- ADD TASK MODAL -->
+<div class="modal-overlay" id="taskModal">
+  <div class="modal">
+    <h3>⚔ Name Your Next Victim</h3>
+    <div class="modal-field">
+      <label>Task</label>
+      <input type="text" id="modal-title" placeholder="What must be slayed..." />
+    </div>
+    <div class="modal-field">
+      <label>Description</label>
+      <textarea id="modal-desc" placeholder="Details..."></textarea>
+    </div>
+    <div class="modal-field">
+      <label>Due Date</label>
+      <input type="date" id="modal-due" />
+    </div>
+    <div class="modal-field">
+      <label>Priority</label>
+      <select id="modal-priority">
+        <option value="high">High</option>
+        <option value="medium" selected>Medium</option>
+        <option value="low">Low</option>
+      </select>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal()">Cancel</button>
+      <button class="btn-add" onclick="submitTask()">⚔ Slay</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  const CSRF = '{{ csrf_token }}';
+
+  function openModal() {
+    document.getElementById('taskModal').classList.add('open');
+    document.getElementById('modal-title').focus();
+  }
+  function closeModal() {
+    document.getElementById('taskModal').classList.remove('open');
+    document.getElementById('modal-title').value = '';
+    document.getElementById('modal-desc').value = '';
+    document.getElementById('modal-due').value = '';
+    document.getElementById('modal-priority').value = 'medium';
+  }
+
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2500);
+  }
+
+  async function submitTask() {
+    const title = document.getElementById('modal-title').value.trim();
+    if (!title) return;
+    const res = await fetch('/api/tasks/add/', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json','X-CSRFToken':CSRF},
+      body: JSON.stringify({
+        title,
+        description: document.getElementById('modal-desc').value,
+        due_date: document.getElementById('modal-due').value,
+        priority: document.getElementById('modal-priority').value,
+      })
+    });
+    const data = await res.json();
+    if (data.success) {
+      closeModal();
+      showToast('Task added — ' + data.title);
+      setTimeout(() => location.reload(), 800);
+    }
+  }
+
+  async function slayTask(id, el) {
+    el.stopPropagation();
+    const res = await fetch(`/api/tasks/${id}/slay/`, {
+      method:'POST', headers:{'X-CSRFToken':CSRF}
+    });
+    const data = await res.json();
+    if (data.success) {
+      showToast(data.is_slayed ? '⚔ Slayed!' : 'Revived!');
+      setTimeout(() => location.reload(), 600);
+    }
+  }
+
+  async function deleteTask(id, el) {
+    el.stopPropagation();
+    if (!confirm('Delete this task?')) return;
+    const res = await fetch(`/api/tasks/${id}/delete/`, {
+      method:'POST', headers:{'X-CSRFToken':CSRF}
+    });
+    const data = await res.json();
+    if (data.success) {
+      showToast('Task deleted.');
+      setTimeout(() => location.reload(), 600);
+    }
+  }
+
+  function toggleDetail(el) {
+    const detail = el.querySelector('.task-detail');
+    if (detail) detail.classList.toggle('open');
+  }
+
+  // Enter to open quick-add
+  document.addEventListener('keydown', e => {
+    if (e.key === 'n' && !e.target.matches('input,textarea,select')) openModal();
+    if (e.key === 'Escape') closeModal();
+  });
+</script>
+{% block extra_js %}{% endblock %}
+</body>
+</html>

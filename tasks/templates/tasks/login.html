@@ -1,0 +1,80 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Shinori – Login</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Rajdhani:wght@500;600&display=swap" rel="stylesheet">
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body {
+      font-family: 'Rajdhani', sans-serif;
+      min-height: 100vh;
+      background: radial-gradient(ellipse at 30% 50%, #2a1a4e 0%, #0d0d1a 60%, #0a0a12 100%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    .jp-text {
+      position: fixed; right: 24px; top: 50%;
+      transform: translateY(-50%);
+      writing-mode: vertical-rl;
+      font-family: serif; font-size: 1.4rem;
+      color: rgba(255,255,255,.12); letter-spacing: .3em; user-select:none;
+    }
+    .logo-block { text-align:center; margin-bottom:36px; }
+    .logo-swords { font-size:3.5rem; display:block; color:#7c6aff; margin-bottom:8px; }
+    .logo-title { font-family:'Cinzel',serif; font-size:2.4rem; font-weight:700; letter-spacing:.1em; color:#e8e4ff; }
+    .logo-title .dim { color:#6e6b8a; }
+    .logo-sub { font-size:.75rem; letter-spacing:.25em; color:#6e6b8a; text-transform:uppercase; margin-top:4px; }
+    .card { background:#e8e4f0; border-radius:14px; padding:40px 48px 36px; width:480px; max-width:95vw; }
+    .field-label { font-family:'Cinzel',serif; font-size:1.4rem; font-weight:600; color:#1a1a2e; margin-bottom:10px; display:block; }
+    .field-input {
+      width:100%; background:transparent; border:1.5px solid #b0a8c8;
+      border-radius:6px; padding:12px 16px; font-family:'Cinzel',serif;
+      font-size:.9rem; color:#2a2440; letter-spacing:.05em; outline:none;
+      margin-bottom:24px; transition:border-color .2s;
+    }
+    .field-input::placeholder { color:#9990b8; font-style:italic; }
+    .field-input:focus { border-color:#7c6aff; }
+    .submit-btn {
+      width:100%; padding:14px; background:#7c6aff; border:none; border-radius:8px;
+      color:#fff; font-family:'Rajdhani',sans-serif; font-size:1rem; font-weight:700;
+      letter-spacing:.18em; text-transform:uppercase; cursor:pointer; transition:background .2s; margin-top:8px;
+    }
+    .submit-btn:hover { background:#a08fff; }
+    .bottom-link { text-align:center; margin-top:16px; font-size:.85rem; color:#6e6b8a; }
+    .bottom-link a { color:#7c6aff; text-decoration:none; }
+    .bottom-link a:hover { text-decoration:underline; }
+    .error-msg { background:rgba(192,57,43,.15); border:1px solid rgba(192,57,43,.4); border-radius:6px; padding:10px 14px; color:#e74c3c; font-size:.9rem; margin-bottom:18px; }
+  </style>
+</head>
+<body>
+  <div class="jp-text">シノリ・タスク・スレイヤー。</div>
+  <div class="logo-block">
+    <span class="logo-swords">⚔</span>
+    <div class="logo-title">Shi<span class="dim">nori</span></div>
+    <div class="logo-sub">Slay your tasks , one by one</div>
+  </div>
+  <div class="card">
+    {% if form.errors %}
+      <div class="error-msg">Invalid credentials. Try again, warrior.</div>
+    {% endif %}
+    <form method="post">
+      {% csrf_token %}
+      <label class="field-label">Email</label>
+      <input class="field-input" type="text" name="username" placeholder="Warrior's Email...." required />
+      <label class="field-label">Password</label>
+      <input class="field-input" type="password" name="password" placeholder="Your secret jutsu...." required />
+      <input type="hidden" name="next" value="{{ next }}" />
+      <button class="submit-btn" type="submit">⚔ Enter</button>
+    </form>
+    <div class="bottom-link">
+      New warrior? <a href="{% url 'register' %}">Join the battlefield</a>
+    </div>
+  </div>
+</body>
+</html>

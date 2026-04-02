@@ -1,0 +1,73 @@
+{% extends 'tasks/base.html' %}
+
+{% block content %}
+<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
+  <!-- FILTER TABS -->
+  <div class="filter-tabs" style="margin-bottom:0;">
+    <a href="?filter=all"    class="filter-tab {% if filter_type == 'all' %}active{% endif %}">All</a>
+    <a href="?filter=slayed" class="filter-tab {% if filter_type == 'slayed' %}active{% endif %}">Slayed</a>
+    <a href="?filter=alive"  class="filter-tab {% if filter_type == 'alive' %}active{% endif %}">Alive</a>
+  </div>
+
+  <!-- SEARCH -->
+  <div class="search-wrap">
+    <form method="get" style="display:flex;align-items:center;">
+      <input type="hidden" name="filter" value="{{ filter_type }}">
+      <input class="search-input" name="q" type="text"
+             placeholder="Search..." value="{{ search_query }}" />
+      <span class="search-icon">🔍</span>
+    </form>
+  </div>
+
+  <!-- ADD -->
+  <button class="slay-btn" onclick="openModal()" style="padding:10px 22px;font-size:.85rem;">⚔ Add</button>
+</div>
+
+<div class="section-divider"></div>
+
+<!-- ALIVE TASKS -->
+<div class="task-list">
+  {% for task in alive_tasks %}
+    <div class="task-item" onclick="toggleDetail(this)">
+      <div class="task-check" onclick="slayTask({{ task.id }}, event)"></div>
+      <span class="task-title">{{ task.title }}</span>
+      <span class="priority-dot {{ task.priority }}"></span>
+      <button class="task-delete" onclick="deleteTask({{ task.id }}, event)">✕</button>
+      <div class="task-detail {% if task.description or task.due_date %}{% endif %}">
+        {% if task.description %}{{ task.description }}{% endif %}
+        {% if task.due_date %}<br>📅 To be completed {{ task.due_date|date:"F Y" }}{% endif %}
+      </div>
+    </div>
+  {% endfor %}
+</div>
+
+<!-- SLAYED SECTION -->
+{% if slayed_tasks %}
+<div class="section-divider"></div>
+<div class="section-label">Slayed</div>
+<div class="task-list">
+  {% for task in slayed_tasks %}
+    <div class="task-item slayed" onclick="toggleDetail(this)">
+      <div class="task-check checked" onclick="slayTask({{ task.id }}, event)"></div>
+      <span class="task-title">{{ task.title }}</span>
+      <span class="priority-dot {{ task.priority }}"></span>
+      <button class="task-delete" onclick="deleteTask({{ task.id }}, event)">✕</button>
+      <div class="task-detail">
+        {% if task.description %}{{ task.description }}{% endif %}
+        {% if task.due_date %}<br>📅 Was due {{ task.due_date|date:"F Y" }}{% endif %}
+      </div>
+    </div>
+  {% endfor %}
+</div>
+{% endif %}
+
+{% if not alive_tasks and not slayed_tasks %}
+  <div style="color:var(--text-faint);letter-spacing:.1em;text-align:center;padding:60px 0;">
+    {% if search_query %}
+      No tasks matching "{{ search_query }}"
+    {% else %}
+      No tasks yet — press <kbd style="background:var(--bg-card2);padding:2px 8px;border-radius:4px;">N</kbd> to begin your quest
+    {% endif %}
+  </div>
+{% endif %}
+{% endblock %}

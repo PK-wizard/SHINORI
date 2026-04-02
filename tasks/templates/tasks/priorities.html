@@ -1,0 +1,79 @@
+{% extends 'tasks/base.html' %}
+
+{% block content %}
+<div style="display:flex;justify-content:flex-end;margin-bottom:24px;">
+  <button class="slay-btn" onclick="openModal()" style="padding:10px 22px;font-size:.85rem;">⚔ Add Task</button>
+</div>
+
+{% if high_tasks %}
+<div class="priority-section">
+  <div class="priority-heading">
+    <span class="priority-dot high"></span> High Priority
+  </div>
+  <div class="task-list">
+    {% for task in high_tasks %}
+      <div class="task-item" onclick="toggleDetail(this)">
+        <div class="task-check" onclick="slayTask({{ task.id }}, event)"></div>
+        <span class="task-title">{{ task.title }}</span>
+        <span class="priority-dot high"></span>
+        <button class="task-delete" onclick="deleteTask({{ task.id }}, event)">✕</button>
+        <div class="task-detail">
+          {% if task.description %}{{ task.description }}{% endif %}
+          {% if task.due_date %}<br>📅 Due: {{ task.due_date|date:"F j, Y" }}{% endif %}
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+</div>
+{% endif %}
+
+{% if medium_tasks %}
+<div class="priority-section">
+  <div class="priority-heading">
+    <span class="priority-dot medium"></span> Medium Priority
+  </div>
+  <div class="task-list">
+    {% for task in medium_tasks %}
+      <div class="task-item" onclick="toggleDetail(this)">
+        <div class="task-check" onclick="slayTask({{ task.id }}, event)"></div>
+        <span class="task-title">{{ task.title }}</span>
+        <span class="priority-dot medium"></span>
+        <button class="task-delete" onclick="deleteTask({{ task.id }}, event)">✕</button>
+        <div class="task-detail">
+          {% if task.description %}{{ task.description }}{% endif %}
+          {% if task.due_date %}<br>📅 Due: {{ task.due_date|date:"F j, Y" }}{% endif %}
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+</div>
+{% endif %}
+
+{% if low_tasks %}
+<div class="priority-section">
+  <div class="priority-heading">
+    <span class="priority-dot low"></span> Low Priority
+  </div>
+  <div class="task-list">
+    {% for task in low_tasks %}
+      <div class="task-item" onclick="toggleDetail(this)">
+        <div class="task-check" onclick="slayTask({{ task.id }}, event)"></div>
+        <span class="task-title">{{ task.title }}</span>
+        <span class="priority-dot low"></span>
+        <button class="task-delete" onclick="deleteTask({{ task.id }}, event)">✕</button>
+        <div class="task-detail">
+          {% if task.description %}{{ task.description }}{% endif %}
+          {% if task.due_date %}<br>📅 Due: {{ task.due_date|date:"F j, Y" }}{% endif %}
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+</div>
+{% endif %}
+
+{% if not high_tasks and not medium_tasks and not low_tasks %}
+  <div style="color:var(--text-faint);letter-spacing:.1em;text-align:center;padding:60px 0;">
+    All tasks slayed — you are truly the strongest ⚔
+  </div>
+{% endif %}
+{% endblock %}
