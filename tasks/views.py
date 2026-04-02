@@ -18,7 +18,7 @@ def register(request):
         from django.contrib.auth.models import User
         if User.objects.filter(username=email).exists():
             return render(request, 'tasks/register.html', {'error': 'A warrior with that email already exists.'})
-        user = User.objects.create_user(username=email, email=email, password=password, first_name=name)  # CHANGE password=email + '_shinori' to password=password
+        user = User.objects.create_user(username=email, email=email, password=email, first_name=name)  # CHANGE password=email + '_shinori' to password=password
         login(request, user)
         return redirect('dashboard')
     return render(request, 'tasks/register.html') 
